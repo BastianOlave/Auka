@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+{% block title %}Eliminar noticia{% endblock %}
+
+{% block content %}
+<article class="card">
+    <h1>Eliminar noticia</h1>
+    <p>¿Estás segura de eliminar <strong>"{{ noticia.titulo }}"</strong>?</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'novedades:novedades_lista' %}" class="btn btn-ghost">
+            No, volver
+        </a>
+    </form>
+</article>
+{% endblock %}

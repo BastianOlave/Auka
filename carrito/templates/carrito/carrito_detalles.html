@@ -1,0 +1,138 @@
+{% extends 'core/base.html' %}
+{% load filtros_extra %}{% block title %}Carrito de compras{% endblock %}
+
+{% block content %}
+
+<style>
+/* Contenedor general */
+.cart-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Tabla */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 16px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.cart-table thead {
+    background: linear-gradient(90deg, #d8c7b0, #c5a98b);
+    color: white;
+}
+
+.cart-table th, .cart-table td {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 16px;
+}
+
+.cart-table tr:nth-child(even) {
+    background: #f9f7f4;
+}
+
+.cart-table tr:hover {
+    background: #f1ece6;
+}
+
+/* Total */
+.cart-total {
+    font-size: 20px;
+    margin-top: 20px;
+    text-align: right;
+}
+
+/* Botones */
+.btn-primary {
+    background: linear-gradient(90deg, #7a8f72, #c8a48c);
+    border: none;
+    padding: 12px 26px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+    transform: scale(1.04);
+    opacity: .9;
+}
+
+.btn-ghost {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1px solid #c4b9a8;
+    color: #6e6257;
+    background: white;
+    transition: .2s;
+}
+
+.btn-ghost:hover {
+    background: #f2eee9;
+}
+
+/* Footer links */
+.back-link {
+    margin-top: 25px;
+    display: inline-block;
+}
+</style>
+
+<div class="cart-container">
+
+    <h1 style="text-align: center; margin-bottom: 25px;">Tu carrito</h1>
+
+    {% if items %}
+    
+    <table class="cart-table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>{{ item.subtotal|clp }}</td>
+                <td>
+                    <a href="{% url 'carrito:cart_remove' item.producto.pk %}" class="btn-ghost">
+                        Quitar
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="cart-total">
+        Total: <strong>{{total|clp}}</strong>
+    </p>
+
+    <form method="post" action="{% url 'carrito:cart_checkout' %}" style="text-align: right;">
+        {% csrf_token %}
+        <button type="submit" class="btn-primary">Comprar</button>
+    </form>
+
+    {% else %}
+        <p style="text-align:center; margin-top:30px; font-size:18px;">El carrito está vacío </p>
+    {% endif %}
+
+    <a href="{% url 'catalogo:producto_lista' %}" class="btn-ghost back-link">
+        ← Seguir comprando
+    </a>
+
+</div>
+
+{% endblock %}

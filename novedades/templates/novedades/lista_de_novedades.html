@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Novedades - Auka Terapias{% endblock %}
+
+{% block content %}
+<h1>Novedades</h1>
+<p>Noticias, ferias, lanzamientos y actualizaciones del proyecto.</p>
+
+{% if user.is_authenticated %}
+    <p>
+        <a href="{% url 'novedades:crear_novedades' %}" class="btn btn-primary">
+            + Crear noticia
+        </a>
+    </p>
+{% endif %}
+
+<ul class="list-clean">
+    {% for noticia in noticias %}
+        <li>
+            <a href="{% url 'novedades:novedades_detalles' noticia.pk %}">
+                {{ noticia.titulo }}
+            </a>
+            <span class="meta">
+                · {{ noticia.creado_en|date:"d/m/Y" }}
+            </span>
+        </li>
+    {% empty %}
+        <li>No hay novedades publicadas.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

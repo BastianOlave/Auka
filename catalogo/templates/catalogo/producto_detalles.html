@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% load humanize %}
+{% load filtros_extra %}{% block title %}{{ producto.nombre }} - Auka Terapias{% endblock %}
+
+{% block content %}
+<article class="card">
+    <h1>{{ producto.nombre }}</h1>
+
+    {% if producto.imagen %}
+        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+    {% endif %}
+
+    <p>{{ producto.descripcion }}</p>
+
+    <p class="meta">
+        Categoría: {{ producto.categoria.nombre }} ·
+        Stock: {{ producto.stock }}
+    </p>
+
+    <p><strong>{{ producto.precio|clp }}</strong>
+</p>
+
+    <div class="card-footer">
+
+                    {% if user.is_authenticated %}
+                        {% if producto.activo and producto.stock > 0 %}
+                        <a href="{% url 'carrito:cart_add' producto.pk %}" class="btn btn-primary">
+                            Añadir al carrito
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login:login' %}" class="btn btn-primary">
+                            Inicia sesión para comprar
+                        </a>
+                    {% endif %}
+
+        <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">
+            ← Volver al catálogo
+        </a>
+
+        {% if user.is_staff %}
+            <span class="meta">
+                <a href="{% url 'catalogo:product_update' producto.pk %}">Editar</a> ·
+                <a href="{% url 'catalogo:product_delete' producto.pk %}">Eliminar</a>
+            </span>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

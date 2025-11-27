@@ -1,0 +1,168 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load filtros_extra %}
+{% block title %}Catálogo - Auka Terapias{% endblock %}
+
+{% block content %}
+<h1>Catálogo de productos</h1>
+<p>Explora los preparados, mezclas y esencias disponibles.</p>
+
+<form method="get" class="form-inline">
+    <div class="field-group">
+        <label for="categoria">Filtrar por categoría</label>
+        <select name="categoria" id="categoria" onchange="this.form.submit()">
+            <option value="">Todas</option>
+            {% for categoria in categorias %}
+                <option value="{{ categoria.id }}"
+                    {% if categoria_seleccionada|default:'' == categoria.id|stringformat:'s' %}selected{% endif %}>
+                    {{ categoria.nombre }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+{% if user.is_staff %}
+    <p>
+        <a href="{% url 'catalogo:product_create' %}" class="btn btn-primary">
+            + Crear producto
+        </a>
+    </p>
+{% endif %}
+
+<div class="grid fila-1">
+    {% for producto in productos|slice:":3" %}
+        <article class="card card--service">
+
+            <div class="card-image-wrapper">
+                
+                <a href="{% url 'catalogo:producto_detalles' producto.pk %}" style="display: block;">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="card-image">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="sin imagen" class="card-image">
+                    {% endif %}
+                </a>
+                <span class="badge badge--stock">
+                    {{ producto.stock }} disponibles
+                </span>
+            </div>
+
+            <div class="card-body">
+                <h3 class="card-title">{{ producto.nombre }}</h3>
+
+                {% if producto.categoria %}
+                    <p class="card-category">{{ producto.categoria.nombre }}</p>
+                {% endif %}
+
+                <p class="card-description">
+                    {{ producto.descripcion|truncatewords:22 }}
+                </p>
+            </div>
+
+            <div class="card-footer card-footer--split">
+                <div class="card-price">
+                    <small>Valor</small>
+                    <strong>{{ producto.precio|clp }}</strong>
+                </div>
+
+                <div class="card-actions" style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                    <a href="{% url 'catalogo:producto_detalles' producto.pk %}" class="btn btn-ghost">
+                        Ver detalle
+                    </a>
+
+                    {% if user.is_authenticated %}
+                        {% if producto.activo and producto.stock > 0 %}
+                        <a href="{% url 'carrito:cart_add' producto.pk %}" class="btn btn-primary">
+                            Añadir al carrito
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login:login' %}" class="btn btn-primary">
+                            Inicia sesión para comprar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </article>
+    {% endfor %}
+</div>
+
+
+<div class="grid fila-2">
+       {% for producto in productos|slice:"3:6" %}
+        <article class="card card--service">
+
+            <div class="card-image-wrapper">
+                
+                <a href="{% url 'catalogo:producto_detalles' producto.pk %}" style="display: block;">
+                    {% if producto.imagen %}
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="card-image">
+                    {% else %}
+                        <img src="{% static 'images/placeholder.png' %}" alt="sin imagen" class="card-image">
+                    {% endif %}
+                </a>
+                <span class="badge badge--stock">
+                    {{ producto.stock }} disponibles
+                </span>
+            </div>
+
+            <div class="card-body">
+                <h3 class="card-title">{{ producto.nombre }}</h3>
+
+                {% if producto.categoria %}
+                    <p class="card-category">{{ producto.categoria.nombre }}</p>
+                {% endif %}
+
+                <p class="card-description">
+                    {{ producto.descripcion|truncatewords:22 }}
+                </p>
+            </div>
+
+            <div class="card-footer card-footer--split">
+                <div class="card-price">
+                    <small>Valor</small>
+                    <strong>{{ producto.precio|clp }}</strong>
+                </div>
+
+                <div class="card-actions" style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+                    <a href="{% url 'catalogo:producto_detalles' producto.pk %}" class="btn btn-ghost">
+                        Ver detalle
+                    </a>
+
+
+                    {% if user.is_authenticated %}
+                        {% if producto.activo and producto.stock > 0 %}
+                        <a href="{% url 'carrito:cart_add' producto.pk %}" class="btn btn-primary">
+                            Añadir al carrito
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login:login' %}" class="btn btn-primary">
+                            Inicia sesión para comprar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+        </article>
+    {% endfor %}
+</div>
+
+
+{% if page_obj.has_other_pages %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">← Anterior</a>
+    {% endif %}
+
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if categoria_seleccionada %}&categoria={{ categoria_seleccionada }}{% endif %}">Siguiente →</a>
+    {% endif %}
+</nav>
+{% endif %}
+
+{% endblock %}

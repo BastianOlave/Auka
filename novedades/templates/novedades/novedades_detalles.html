@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ noticia.titulo }} - Novedades{% endblock %}
+
+{% block content %}
+<article class="card">
+    <h1>{{ noticia.titulo }}</h1>
+    <p class="meta">{{ noticia.creado_en|date:"d/m/Y H:i" }}</p>
+
+    <div>
+        {{ noticia.contenido|linebreaks }}
+    </div>
+
+    <div class="card-footer">
+        <a href="{% url 'novedades:novedades_lista' %}" class="btn btn-ghost">
+            ← Volver a novedades
+        </a>
+
+        {% if user.is_authenticated %}
+            <span class="meta">
+                <a href="{% url 'novedades:actualizar_novedades' noticia.pk %}">Editar</a> ·
+                <a href="{% url 'novedades:eliminar_novedades' noticia.pk %}">Eliminar</a>
+            </span>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

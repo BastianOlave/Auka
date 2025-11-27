@@ -1,0 +1,48 @@
+{% extends 'core/base.html' %}
+{% block title %}Panel de Administración{% endblock %}
+
+{% block content %}
+<h1>Panel de administración simple</h1>
+<p>
+    Desde aquí puedes gestionar el contenido de Auka Terapias
+    de forma sencilla y rápida.
+</p>
+
+<div class="panel-grid">
+    <article class="card">
+        <h3>Catálogo de productos</h3>
+        <p>
+            Crea, edita y organiza los productos que ofreces:
+            mezclas, esencias, preparados y más.
+        </p>
+        <div class="card-footer">
+            <span class="tag">Productos</span>
+            <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">Ir al catálogo</a>
+        </div>
+    </article>
+
+    <article class="card">
+        <h3>Novedades</h3>
+        <p>
+            Publica noticias, ferias, lanzamientos y cambios importantes
+            para mantener a tus clientes al día.
+        </p>
+        <div class="card-footer">
+            <span class="tag">Noticias</span>
+            <a href="{% url 'novedades:novedades_lista' %}" class="btn btn-ghost">Gestionar novedades</a>
+        </div>
+    </article>
+
+    <article class="card">
+        <h3>Panel avanzado</h3>
+        <p>
+            Si necesitas un control más detallado, puedes usar el panel
+            completo de administración de Django.
+        </p>
+        <div class="card-footer">
+            <span class="tag">Admin avanzado</span>
+            <a href="/admin/" class="btn btn-ghost">Abrir Django admin</a>
+        </div>
+    </article>
+</div>
+{% endblock %}

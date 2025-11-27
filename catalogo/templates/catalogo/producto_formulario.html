@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ accion }} producto{% endblock %}
+
+{% block content %}
+<h1>{{ accion }} producto</h1>
+<p>Completa la información del producto para mostrarlo en el catálogo.</p>
+
+{% if user.is_staff %}
+<p>
+    ¿No encuentras la categoría?
+    <a href="{% url 'catalogo:category_create' %}">Crear nueva categoría</a>
+</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+<div id="btn-eliminar-categoria"></div>
+
+<p>
+    <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">
+        Cancelar y volver
+    </a>
+</p>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const tipoSelect = document.getElementById("id_tipo");
+    const categoriaSelect = document.getElementById("id_categoria");
+    const deleteBtnContainer = document.getElementById("btn-eliminar-categoria");
+
+    function actualizarBotonEliminar() {
+        const categoriaId = categoriaSelect.value;
+
+        if (categoriaId) {
+            deleteBtnContainer.innerHTML = `
+                <p>
+                    <a class="btn btn-danger"
+                       href="/catalogo/categoria/${categoriaId}/eliminar/">
+                        Eliminar categoría seleccionada
+                    </a>
+                </p>
+            `;
+        } else {
+            deleteBtnContainer.innerHTML = "";
+        }
+    }
+
+    tipoSelect.addEventListener("change", function () {
+        const tipo = this.value;
+
+        categoriaSelect.innerHTML = '<option value="">-----</option>';
+        deleteBtnContainer.innerHTML = "";
+
+        if (tipo) {
+            fetch(`/catalogo/ajax/cargar-categorias/?tipo=${tipo}`)
+                .then(response => response.json())
+                .then(data => {
+                    categoriaSelect.innerHTML = '<option value="">-----</option>';
+
+                    data.forEach(cat => {
+                        const option = document.createElement("option");
+                        option.value = cat.id;
+                        option.textContent = cat.nombre;
+                        categoriaSelect.appendChild(option);
+                    });
+
+                    actualizarBotonEliminar();
+                });
+        }
+    });
+
+    categoriaSelect.addEventListener("change", actualizarBotonEliminar);
+
+    // Al cargar la página (por si viene con categoría seleccionada)
+    actualizarBotonEliminar();
+});
+</script>
+
+{% endblock %}

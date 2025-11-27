@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ accion }} categoría{% endblock %}
+
+{% block content %}
+<h1>{{ accion }} categoría</h1>
+<p>Completa la información de la categoría para usarla en los productos.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+<p>
+    <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">
+        Cancelar y volver
+    </a>
+</p>
+{% endblock %}

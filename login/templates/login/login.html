@@ -1,0 +1,52 @@
+{% extends 'core/base.html' %}
+{% block title %}Iniciar sesión - Auka Terapias{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-avatar">
+            <span>👤</span>
+        </div>
+        <h1 class="auth-title">Bienvenido</h1>
+        <p class="auth-subtitle">Inicia sesión </p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="auth-field">
+                {{ form.username.errors }}
+                {{ form.username }}
+            </div>
+
+            <div class="auth-field">
+                {{ form.password.errors }}
+                {{ form.password }}
+            </div>
+
+            <div class="auth-options">
+                <label class="auth-remember">
+                    <input type="checkbox" name="remember_me">
+                    <span>Recordarme</span>
+                </label>
+                <!-- (opcional: link a reset password si lo configuras) -->
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                Iniciar sesión
+            </button>
+        </form>
+
+        <p class="auth-alt">
+            ¿Aún no tienes cuenta?
+            <a href="{% url 'login:register' %}">Crear una cuenta</a>
+        </p>
+
+        {% if user.is_authenticated %}
+            <p class="auth-alt">
+                Ya estás conectada, puedes ir al <a href="{% url 'core:panel' %}">panel</a>.
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

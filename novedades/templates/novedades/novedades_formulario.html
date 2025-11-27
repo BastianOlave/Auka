@@ -1,0 +1,19 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ accion }} noticia{% endblock %}
+
+{% block content %}
+<h1>{{ accion }} noticia</h1>
+<p>Escribe el contenido que quieres compartir con tu comunidad.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>
+
+<p>
+    <a href="{% url 'novedades:novedades_lista' %}" class="btn btn-ghost">
+        Cancelar y volver
+    </a>
+</p>
+{% endblock %}

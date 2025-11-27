@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+{% load filtros_extra %}{% block title %}Inicio - Auka Terapias{% endblock %}
+
+{% block content %}
+
+<section class="hero">
+    <div class="hero-inner">
+        <div>
+            <div class="hero-eyebrow">espacio de bienestar natural</div>
+            <h1 class="hero-title">Bienvenida a Auka Terapias</h1>
+            <p class="hero-subtitle">
+                Productos y terapias hechas desde la calma, las plantas y la energía,
+                para acompañarte en tu propio proceso de sanación.
+            </p>
+
+            <div class="hero-cta">
+                <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-primary">
+                    Ver catálogo
+                </a>
+                <a href="{% url 'servicios:servicios' %}" class="btn btn-ghost">
+                    Servicios y puntos
+                </a>
+            </div>
+        </div>
+
+        <div class="hero-card">
+            <div class="hero-badge">
+                ✨ Bienestar holístico · hecho a mano
+            </div>
+            <h3 class="hero-card-title">Una pausa suave para volver a ti</h3>
+            <p>
+                Aceites, esencias y terapias energéticas pensadas para acompañar
+                tus momentos de autocuidado, desde lo simple y lo natural.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>Productos destacados</h2>
+    <p>Una pequeña selección de lo que puedes encontrar en el catálogo.</p>
+
+    <div class="grid">
+        {% for producto in productos_destacados %}
+            <article class="card">
+                
+                {% if producto.imagen %}
+                    <a href="{% url 'catalogo:producto_detalles' producto.pk %}" style="display:block; margin-bottom: 1rem;">
+                        <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+                    </a>
+                {% endif %}
+                <h3>{{ producto.nombre }}</h3>
+                <p>{{ producto.descripcion|truncatewords:20 }}</p>
+                <div class="card-footer">
+                    <span><strong>{{ producto.precio|clp }}</strong></span>
+                    <a href="{% url 'catalogo:producto_detalles' producto.pk %}" class="btn btn-ghost">
+                        Ver detalle
+                    </a>
+                </div>
+            </article>
+        {% empty %}
+            <p>No hay productos aún.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section>
+    <h2>Novedades</h2>
+    <p>Noticias, ferias y pequeños anuncios del camino de Auka.</p>
+    <ul class="list-clean">
+        {% for noticia in noticias_recientes %}
+            <li>
+                <a href="{% url 'novedades:novedades_detalles' noticia.pk %}">
+                    {{ noticia.titulo }}
+                </a>
+                <span class="meta"> · {{ noticia.creado_en|date:"d/m/Y" }}</span>
+            </li>
+        {% empty %}
+            <li>No hay noticias aún.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+{% endblock %}

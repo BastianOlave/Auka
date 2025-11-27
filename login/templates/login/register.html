@@ -1,0 +1,37 @@
+{% extends 'core/base.html' %}
+{% block title %}Registrarse - Auka Terapias{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-avatar">
+            <span>🌿</span>
+        </div>
+        <h1 class="auth-title">Crear cuenta</h1>
+        <p class="auth-subtitle">
+            Registra tu usuario para poder entrar al panel y gestionar productos y noticias.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="auth-field">
+                    {{ field.errors }}
+                    {{ field }}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary auth-submit">
+                Registrarse
+            </button>
+        </form>
+
+        <p class="auth-alt">
+            ¿Ya tienes cuenta?
+            <a href="{% url 'login:login' %}">Iniciar sesión</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
