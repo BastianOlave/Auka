@@ -120,7 +120,6 @@ def cart_checkout(request):
             [getattr(settings, 'DEFAULT_FROM_EMAIL', None)],
             fail_silently=True,
         )
-        messages.success(request, 'Compra realizada. Se ha enviado un correo notificando la compra.')
     except Exception:
         messages.success(request, 'Compra realizada. (El correo no pudo enviarse, revisa la configuración de email).')
 
@@ -128,4 +127,4 @@ def cart_checkout(request):
     request.session['cart'] = {}
     request.session.modified = True
 
-    return redirect('catalogo:producto_lista')
+    return render(request, 'carrito/exito.html')

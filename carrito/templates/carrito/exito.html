@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}¡Compra Exitosa! - Auka Terapias{% endblock %}
+
+{% block content %}
+<div style="
+    min-height: 60vh; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    padding: 2rem;">
+
+    <div style="
+        width: 80px; 
+        height: 80px; 
+        background: #E2F4E7; 
+        color: #264731; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 25px rgba(38, 71, 49, 0.1);">
+        
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--color-primary);">
+        ¡Gracias por preferirnos!
+    </h1>
+
+    <p style="font-size: 1.1rem; color: var(--color-text-soft); max-width: 600px; line-height: 1.6;">
+        Tu compra ha sido realizada con éxito. <br>
+        Se ha enviado un correo notificando los detalles de tu pedido.
+    </p>
+
+    <div style="width: 50px; height: 2px; background: #d8c7b0; margin: 2rem auto;"></div>
+
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+        <a href="{% url 'core:home' %}" class="btn btn-ghost">
+            Volver al inicio
+        </a>
+        <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-primary">
+            Seguir explorando
+        </a>
+    </div>
+
+</div>
+{% endblock %}
