@@ -36,7 +36,7 @@
                 </td>
 
                 <td>
-                    <form action="{% url 'carrito:cart_add' item.producto.pk %}" method="post" id="form-{{ item.producto.pk }}">
+                    <form action="{% url 'carrito:cart_add' item.producto.pk %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="override" value="True">
                         
@@ -47,7 +47,7 @@
                                    min="0" 
                                    max="{{ item.producto.stock }}" 
                                    class="quantity-input-small"
-                                   data-original="{{ item.cantidad }}"
+                                   data-original="{{ item.cantidad }}" 
                                    onchange="validarCantidad(this)">
                         </div>
                     </form>
@@ -57,7 +57,9 @@
 
                 <td>
                     <a href="#" 
-                       onclick="confirmarEliminar(event, '{% url 'carrito:cart_remove' item.producto.pk %}', '{{ item.producto.nombre }}')" 
+                       data-url="{% url 'carrito:cart_remove' item.producto.pk %}"
+                       data-nombre="{{ item.producto.nombre }}"
+                       onclick="confirmarEliminar(event, this)" 
                        class="btn-ghost" 
                        style="padding: 5px 10px; font-size: 0.8rem; color: #C6554B; border-color: #C6554B;">
                         Quitar
@@ -96,9 +98,13 @@
     const colorPrimario = '#7A8C76';
     const colorRojo = '#C6554B';
 
-    // Función para cuando presionas "Quitar"
-    function confirmarEliminar(e, urlDestino, nombreProducto) {
-        e.preventDefault(); // Evita que el link funcione de inmediato
+    // Función CORREGIDA: Ahora recibe el elemento completo (el botón)
+    function confirmarEliminar(e, btn) {
+        e.preventDefault(); 
+        
+        // Leemos los datos desde los atributos data- del botón
+        const urlDestino = btn.getAttribute('data-url');
+        const nombreProducto = btn.getAttribute('data-nombre');
 
         Swal.fire({
             title: '¿Eliminar producto?',
@@ -109,22 +115,22 @@
             cancelButtonColor: colorPrimario,
             confirmButtonText: 'Sí, eliminar',
             cancelButtonText: 'Cancelar',
-            background: '#FFFDF8', // Tu color de fondo crema
-            color: '#3F3A33'       // Tu color de texto
+            background: '#FFFDF8',
+            color: '#3F3A33'
         }).then((result) => {
             if (result.isConfirmed) {
-                window.location.href = urlDestino; // Si dice sí, vamos al link
+                window.location.href = urlDestino;
             }
         });
     }
 
-    // Función para cuando cambias el numerito a 0
+    // Función CORREGIDA: Si cancela, vuelve al número anterior real
     function validarCantidad(input) {
         const formulario = input.form;
         const valor = parseInt(input.value);
+        const original = input.getAttribute('data-original'); // Obtenemos el valor original
 
         if (valor === 0) {
-            // Si puso 0, preguntamos
             Swal.fire({
                 title: '¿Quitar del carrito?',
                 text: "Has seleccionado 0 cantidad. ¿Deseas eliminar el producto?",
@@ -136,13 +142,12 @@
                 cancelButtonText: 'No, me equivoqué'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    formulario.submit(); // Enviamos el 0 para que el backend lo borre
+                    formulario.submit();
                 } else {
-                    input.value = 1; // Si se arrepiente, volvemos a poner 1
+                    input.value = original; // Restauramos el valor original, no solo "1"
                 }
             });
         } else {
-            // Si el valor es mayor a 0 (ej: cambio de 1 a 2), guardamos directo
             formulario.submit();
         }
     }
