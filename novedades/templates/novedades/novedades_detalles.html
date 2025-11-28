@@ -1,26 +1,51 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
 {% block title %}{{ noticia.titulo }} - Novedades{% endblock %}
 
 {% block content %}
-<article class="card">
-    <h1>{{ noticia.titulo }}</h1>
-    <p class="meta">{{ noticia.creado_en|date:"d/m/Y H:i" }}</p>
 
-    <div>
+<article style="max-width: 800px; margin: 0 auto; padding: 0;">
+    
+    <header style="text-align: center; margin-bottom: 2rem;">
+        <span class="tag" style="margin-bottom: 1rem; display: inline-block; background: #E2E8F0; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+            Novedades Auka
+        </span>
+        
+        <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; line-height: 1.2;">
+            {{ noticia.titulo }}
+        </h1>
+        
+        <p style="color: var(--color-text-soft);">
+            Publicado el {{ noticia.creado_en|date:"d \d\e F \d\e Y" }} a las {{ noticia.creado_en|date:"H:i" }}
+        </p>
+    </header>
+
+    {% if noticia.imagen %}
+        <div style="margin-bottom: 2rem; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.08);">
+            <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" style="width: 100%; display: block;">
+        </div>
+    {% endif %}
+
+    <div style="font-size: 1.15rem; line-height: 1.8; color: #4a4a4a; margin-bottom: 3rem;">
         {{ noticia.contenido|linebreaks }}
     </div>
 
-    <div class="card-footer">
+    <footer style="border-top: 1px solid #e0dcd3; padding-top: 2rem; margin-top: 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        
         <a href="{% url 'novedades:novedades_lista' %}" class="btn btn-ghost">
             ← Volver a novedades
         </a>
 
         {% if user.is_authenticated %}
-            <span class="meta">
-                <a href="{% url 'novedades:actualizar_novedades' noticia.pk %}">Editar</a> ·
-                <a href="{% url 'novedades:eliminar_novedades' noticia.pk %}">Eliminar</a>
-            </span>
+            <div class="meta" style="font-size: 0.9rem;">
+                <span style="color: #999; margin-right: 10px;">Acciones de admin:</span>
+                <a href="{% url 'novedades:actualizar_novedades' noticia.pk %}" style="font-weight: bold; margin-right: 10px;">Editar</a>
+                <a href="{% url 'novedades:eliminar_novedades' noticia.pk %}" style="color: #C6554B; font-weight: bold;">Eliminar</a>
+            </div>
         {% endif %}
-    </div>
+    </footer>
+
 </article>
+
 {% endblock %}

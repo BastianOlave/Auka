@@ -1,30 +1,60 @@
 {% extends 'core/base.html' %}
+{% load static %}
+
 {% block title %}Novedades - Auka Terapias{% endblock %}
 
 {% block content %}
-<h1>Novedades</h1>
-<p>Noticias, ferias, lanzamientos y actualizaciones del proyecto.</p>
 
-{% if user.is_authenticated %}
-    <p>
+<header style="display: flex; justify-content: space-between; align-items: end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1>Novedades</h1>
+        <p>Noticias, ferias, lanzamientos y actualizaciones del proyecto.</p>
+    </div>
+
+    {% if user.is_staff %}
         <a href="{% url 'novedades:crear_novedades' %}" class="btn btn-primary">
             + Crear noticia
         </a>
-    </p>
-{% endif %}
+    {% endif %}
+</header>
 
-<ul class="list-clean">
+<div class="grid">
     {% for noticia in noticias %}
-        <li>
-            <a href="{% url 'novedades:novedades_detalles' noticia.pk %}">
-                {{ noticia.titulo }}
-            </a>
-            <span class="meta">
-                · {{ noticia.creado_en|date:"d/m/Y" }}
-            </span>
-        </li>
+        <article class="card" style="display: flex; flex-direction: column; height: 100%;">
+            
+            {% if noticia.imagen %}
+                <a href="{% url 'novedades:novedades_detalles' noticia.pk %}" style="display: block;">
+                    <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" style="height: 200px; width: 100%; object-fit: cover; border-radius: 12px;">
+                </a>
+            {% endif %}
+
+            <div style="padding: 1rem 0; flex-grow: 1;">
+                <small style="color: var(--color-text-soft); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">
+                    {{ noticia.creado_en|date:"d \d\e F, Y" }}
+                </small>
+
+                <h3 style="margin-top: 0.5rem; font-size: 1.4rem;">
+                    <a href="{% url 'novedades:novedades_detalles' noticia.pk %}" style="color: var(--color-text); text-decoration: none;">
+                        {{ noticia.titulo }}
+                    </a>
+                </h3>
+
+                <p style="margin-bottom: 1rem; color: var(--color-text-soft);">
+                    {{ noticia.contenido|striptags|truncatewords:20 }}
+                </p>
+            </div>
+
+            <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 1rem; margin-top: auto;">
+                <a href="{% url 'novedades:novedades_detalles' noticia.pk %}" style="font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;">
+                    Leer más <span>→</span>
+                </a>
+            </div>
+        </article>
     {% empty %}
-        <li>No hay novedades publicadas.</li>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; opacity: 0.6;">
+            <p>No hay novedades publicadas por el momento.</p>
+        </div>
     {% endfor %}
-</ul>
+</div>
+
 {% endblock %}
