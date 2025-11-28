@@ -1,113 +1,65 @@
 {% extends 'core/base.html' %}
-{% load filtros_extra %}{% block title %}Carrito de compras{% endblock %}
+{% load static %}
+{% load filtros_extra %}
+
+{% block title %}Tu carrito - Auka Terapias{% endblock %}
 
 {% block content %}
 
-<style>
-/* Contenedor general */
-.cart-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-/* Tabla */
-.cart-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 16px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-}
-
-.cart-table thead {
-    background: linear-gradient(90deg, #d8c7b0, #c5a98b);
-    color: white;
-}
-
-.cart-table th, .cart-table td {
-    padding: 14px 18px;
-    text-align: left;
-    font-size: 16px;
-}
-
-.cart-table tr:nth-child(even) {
-    background: #f9f7f4;
-}
-
-.cart-table tr:hover {
-    background: #f1ece6;
-}
-
-/* Total */
-.cart-total {
-    font-size: 20px;
-    margin-top: 20px;
-    text-align: right;
-}
-
-/* Botones */
-.btn-primary {
-    background: linear-gradient(90deg, #7a8f72, #c8a48c);
-    border: none;
-    padding: 12px 26px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 12px;
-    color: white;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.btn-primary:hover {
-    transform: scale(1.04);
-    opacity: .9;
-}
-
-.btn-ghost {
-    padding: 10px 18px;
-    border-radius: 10px;
-    border: 1px solid #c4b9a8;
-    color: #6e6257;
-    background: white;
-    transition: .2s;
-}
-
-.btn-ghost:hover {
-    background: #f2eee9;
-}
-
-/* Footer links */
-.back-link {
-    margin-top: 25px;
-    display: inline-block;
-}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="cart-container">
-
-    <h1 style="text-align: center; margin-bottom: 25px;">Tu carrito</h1>
+    <h1 style="text-align: center; margin-bottom: 2rem;">Tu carrito</h1>
 
     {% if items %}
-    
     <table class="cart-table">
         <thead>
             <tr>
                 <th>Producto</th>
                 <th>Cantidad</th>
                 <th>Subtotal</th>
-                <th></th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for item in items %}
             <tr>
-                <td>{{ item.producto.nombre }}</td>
-                <td>{{ item.cantidad }}</td>
-                <td>{{ item.subtotal|clp }}</td>
                 <td>
-                    <a href="{% url 'carrito:cart_remove' item.producto.pk %}" class="btn-ghost">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        {% if item.producto.imagen %}
+                            <img src="{{ item.producto.imagen.url }}" alt="{{ item.producto.nombre }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                        {% else %}
+                            <div style="width: 50px; height: 50px; background: #eee; border-radius: 8px;"></div>
+                        {% endif %}
+                        <span>{{ item.producto.nombre }}</span>
+                    </div>
+                </td>
+
+                <td>
+                    <form action="{% url 'carrito:cart_add' item.producto.pk %}" method="post" id="form-{{ item.producto.pk }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="override" value="True">
+                        
+                        <div class="quantity-group">
+                            <input type="number" 
+                                   name="cantidad" 
+                                   value="{{ item.cantidad }}" 
+                                   min="0" 
+                                   max="{{ item.producto.stock }}" 
+                                   class="quantity-input-small"
+                                   data-original="{{ item.cantidad }}"
+                                   onchange="validarCantidad(this)">
+                        </div>
+                    </form>
+                </td>
+
+                <td>{{ item.subtotal|clp }}</td>
+
+                <td>
+                    <a href="#" 
+                       onclick="confirmarEliminar(event, '{% url 'carrito:cart_remove' item.producto.pk %}', '{{ item.producto.nombre }}')" 
+                       class="btn-ghost" 
+                       style="padding: 5px 10px; font-size: 0.8rem; color: #C6554B; border-color: #C6554B;">
                         Quitar
                     </a>
                 </td>
@@ -116,23 +68,84 @@
         </tbody>
     </table>
 
-    <p class="cart-total">
-        Total: <strong>{{total|clp}}</strong>
-    </p>
+    <div class="cart-total">
+        <strong>Total: {{ total|clp }}</strong>
+    </div>
 
-    <form method="post" action="{% url 'carrito:cart_checkout' %}" style="text-align: right;">
-        {% csrf_token %}
-        <button type="submit" class="btn-primary">Comprar</button>
-    </form>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+        <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">
+            ← Seguir comprando
+        </a>
+        
+        <a href="{% url 'carrito:cart_checkout' %}" class="btn btn-primary">
+            Comprar
+        </a>
+    </div>
 
     {% else %}
-        <p style="text-align:center; margin-top:30px; font-size:18px;">El carrito está vacío </p>
+        <div style="text-align: center; padding: 3rem; opacity: 0.7;">
+            <p>Tu carrito está vacío.</p>
+            <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-primary" style="margin-top: 1rem;">
+                Ir al catálogo
+            </a>
+        </div>
     {% endif %}
-
-    <a href="{% url 'catalogo:producto_lista' %}" class="btn-ghost back-link">
-        ← Seguir comprando
-    </a>
-
 </div>
+
+<script>
+    const colorPrimario = '#7A8C76';
+    const colorRojo = '#C6554B';
+
+    // Función para cuando presionas "Quitar"
+    function confirmarEliminar(e, urlDestino, nombreProducto) {
+        e.preventDefault(); // Evita que el link funcione de inmediato
+
+        Swal.fire({
+            title: '¿Eliminar producto?',
+            text: `¿Estás segura de quitar "${nombreProducto}" del carrito?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: colorRojo,
+            cancelButtonColor: colorPrimario,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            background: '#FFFDF8', // Tu color de fondo crema
+            color: '#3F3A33'       // Tu color de texto
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = urlDestino; // Si dice sí, vamos al link
+            }
+        });
+    }
+
+    // Función para cuando cambias el numerito a 0
+    function validarCantidad(input) {
+        const formulario = input.form;
+        const valor = parseInt(input.value);
+
+        if (valor === 0) {
+            // Si puso 0, preguntamos
+            Swal.fire({
+                title: '¿Quitar del carrito?',
+                text: "Has seleccionado 0 cantidad. ¿Deseas eliminar el producto?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: colorRojo,
+                cancelButtonColor: colorPrimario,
+                confirmButtonText: 'Sí, quitar',
+                cancelButtonText: 'No, me equivoqué'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    formulario.submit(); // Enviamos el 0 para que el backend lo borre
+                } else {
+                    input.value = 1; // Si se arrepiente, volvemos a poner 1
+                }
+            });
+        } else {
+            // Si el valor es mayor a 0 (ej: cambio de 1 a 2), guardamos directo
+            formulario.submit();
+        }
+    }
+</script>
 
 {% endblock %}

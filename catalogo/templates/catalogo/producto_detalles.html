@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %}
 {% load humanize %}
-{% load filtros_extra %}{% block title %}{{ producto.nombre }} - Auka Terapias{% endblock %}
+{% load filtros_extra %}
+{% block title %}{{ producto.nombre }} - Auka Terapias{% endblock %}
 
 {% block content %}
 <article class="card">
@@ -17,22 +18,29 @@
         Stock: {{ producto.stock }}
     </p>
 
-    <p><strong>{{ producto.precio|clp }}</strong>
-</p>
+    <p><strong>{{ producto.precio|clp }}</strong></p>
 
-    <div class="card-footer">
+    <div class="card-footer" style="align-items: flex-end;"> {% if user.is_authenticated %}
+            {% if producto.activo and producto.stock > 0 %}
+                
+                <form action="{% url 'carrito:cart_add' producto.pk %}" method="post" class="add-to-cart-form">
+                    {% csrf_token %}
+                    
+                    <div class="quantity-wrapper">
+                        <label for="cantidad" style="font-size: 0.9rem; color: #666;">Cantidad:</label>
+                        <input type="number" id="cantidad" name="cantidad" value="1" min="1" max="{{ producto.stock }}" class="quantity-input">
+                    </div>
 
-                    {% if user.is_authenticated %}
-                        {% if producto.activo and producto.stock > 0 %}
-                        <a href="{% url 'carrito:cart_add' producto.pk %}" class="btn btn-primary">
-                            Añadir al carrito
-                        </a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{% url 'login:login' %}" class="btn btn-primary">
-                            Inicia sesión para comprar
-                        </a>
-                    {% endif %}
+                    <button type="submit" class="btn btn-primary">
+                        Añadir al carrito
+                    </button>
+                </form>
+                {% endif %}
+        {% else %}
+            <a href="{% url 'login:login' %}" class="btn btn-primary">
+                Inicia sesión para comprar
+            </a>
+        {% endif %}
 
         <a href="{% url 'catalogo:producto_lista' %}" class="btn btn-ghost">
             ← Volver al catálogo

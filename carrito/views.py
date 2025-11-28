@@ -12,14 +12,36 @@ def _get_cart(request):
 
 
 def cart_add(request, pk):
-    producto = get_object_or_404(Product, pk=pk, activo=True, stock__gt=0)
+    producto = get_object_or_404(Product, pk=pk)
     cart = _get_cart(request)
     key = str(pk)
-    cart[key] = cart.get(key, 0) + 1
-    request.session.modified = True
-    messages.success(request, 'Producto añadido al carrito.')
-    return redirect('carrito:carrito_detalles')
+    try:
+        cantidad = int(request.POST.get('cantidad', 1))
+    except ValueError:
+        cantidad = 1
 
+    # Verificamos si es una actualización (desde el carrito) o una suma (desde el catálogo)
+    override = request.POST.get('override') == 'True'
+
+    if cantidad == 0:
+        return cart_remove(request, pk)
+
+    if cantidad > producto.stock:
+        messages.warning(request, f'Solo quedan {producto.stock} unidades de {producto.nombre}.')
+        cantidad = producto.stock # Ajustamos al máximo disponible
+
+    if override:
+        cart[key] = cantidad
+        messages.success(request, 'Carrito actualizado.')
+    else:
+        cart[key] = cart.get(key, 0) + cantidad
+        messages.success(request, f'{producto.nombre} añadido.')
+
+    request.session.modified = True
+    
+    if override:
+        return redirect('carrito:carrito_detalles')
+    return redirect('carrito:carrito_detalles')
 
 def cart_remove(request, pk):
     cart = _get_cart(request)
